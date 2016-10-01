@@ -1,8 +1,9 @@
 <div class="csvParser" ng-controller="ParserCtrl">
+	<p>Choose a CSV file to parse below</p>
 	<div class="input-group btn-file">
 		<label class="input-group-btn">
 			<span class="btn btn-primary">
-				Browse&hellip; <input type="file" input-change="processCSV" readonly style="display: none;">
+				Browse&hellip; <input type="file" input-change="processCSV" readonly style="display: none;" accept="text/csv">
 			</span>
 		</label>
 		<input type="text" class="form-control" readonly/>
