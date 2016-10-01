@@ -1,0 +1,53 @@
+(function() {
+  'use strict';
+
+  angular.module('app.csvParser')
+         .factory('ParserService', function ($q) {
+          return {
+            ReadFile: function(file) {
+              return new Promise(function(resolve, reject) {
+                var r = new FileReader();
+  
+                r.onload = function(evt) {
+                  resolve(evt.target.result);
+                };
+  
+                r.onerror = function(err) {
+                  reject(err);
+                };
+  
+                r.readAsText(file);
+              });
+            },
+            
+            ParseCSV: function(csvData) {
+              return new Promise(function(resolve, reject) {
+                var lines = csvData.split(/\r\n|\n/),
+                    csvObject = {
+                      headers: lines[0].split(","),
+                      data: []
+                    };
+  
+                for(var i=1;i<lines.length;i++){
+    
+                  var obj = {};
+                  var currentLine=lines[i].split(",");
+    
+                  for(var j=0; j < csvObject.headers.length; j++){
+                    obj[csvObject.headers[j]] = currentLine[j];
+                  }
+    
+                  csvObject.data.push(obj);
+                }
+  
+                resolve(csvObject);
+              });
+            },
+  
+            CSVToObject: function(csvFile) {
+              return this.ReadFile(csvFile)
+                  .then(this.ParseCSV);
+            }
+          }
+         });
+})();

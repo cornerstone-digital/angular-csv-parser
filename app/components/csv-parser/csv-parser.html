@@ -1,0 +1,29 @@
+<div class="csvParser" ng-controller="ParserCtrl">
+	<div class="input-group btn-file">
+		<label class="input-group-btn">
+			<span class="btn btn-primary">
+				Browse&hellip; <input type="file" input-change="processCSV" readonly style="display: none;">
+			</span>
+		</label>
+		<input type="text" class="form-control" readonly />
+	</div>
+
+	<div class="contacts row list-group">
+		<div class="item col-xs-6 col-lg-6" ng-repeat="row in fileContent.data|limitTo: 10">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table class="table table-striped">
+						<tr ng-repeat="(key, value) in row">
+							<th>
+								{{ titleCase(key) }}
+							</th>
+							<td>
+								{{ value }}
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
