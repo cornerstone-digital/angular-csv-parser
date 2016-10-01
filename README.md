@@ -1,6 +1,8 @@
 This is an example showing a system which can parse CSV files and output their contents in a simple UI
 
-
+### Required Tools
+##### 1) NodeJS (v5.11.1)
+##### 2) NPM (v3.10.8)
 
 ### Setup
 
