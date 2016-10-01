@@ -8,15 +8,12 @@
                return new Promise(function (resolve, reject) {
                  var reader = new FileReader();
   
-                 reader.addEventListener('load', function (evt) {
+                 reader.onloadend = function (evt) {
                    resolve(evt.target.result);
-                 });
-  
-                 reader.addEventListener('error', function (err) {
-                   reject(err);
-                 });
-  
+                 };
+                 
                  reader.readAsText(file);
+                 
                });
              },
       

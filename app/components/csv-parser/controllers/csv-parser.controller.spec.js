@@ -1,16 +1,19 @@
-describe('SERVICE: ParserService', function() {
-  var ParserService,
-      $rootScope,
-      csvContent,
-      objHeaders,
-      objData;
-      
+describe('CONTROLLER: ParserCtrl', function() {
+  var scope, createController, ParserService, csvContent, event, objHeaders, objData;
+  
   beforeEach(angular.mock.module('app.csvParser'));
-
-  beforeEach(inject(function(_ParserService_, _$rootScope_) {
+  
+  beforeEach(inject(function (_$rootScope_, _$controller_, _ParserService_) {
+    scope = _$rootScope_.$new();
     ParserService = _ParserService_;
-    $rootScope = _$rootScope_;
     
+    createController = function() {
+      return _$controller_('ParserCtrl', {
+        '$scope': scope,
+        'ParserService': ParserService
+      });
+    };
+  
     csvContent = [
       'first_name,last_name,company_name,address,city,county,postal,phone1,phone2,email,web',
       'Aleshia,Tomkiewicz,Alan D Rosenburg Cpa Pc,14 Taylor St,St. Stephens Ward,Kent,CT2 7PP,01835-703597,01944-369967,atomkiewicz@hotmail.com,http://www.alandrosenburgcpapc.co.uk',
@@ -24,9 +27,9 @@ describe('SERVICE: ParserService', function() {
       'Lura,Manzella,Bizerba Usa Inc,929 Augustine St,Staple Hill Ward,South Gloucestershire,BS16 4LL,01907-538509,01340-713951,lura@hotmail.com,http://www.bizerbausainc.co.uk',
       'Yuette,Klapec,Max Video,45 Bradfield St #166,Parwich,Derbyshire,DE6 1QN,01903-649460,01933-512513,yuette.klapec@klapec.co.uk,http://www.maxvideo.co.uk']
       .join('\n');
-      
+  
     objHeaders = ['first_name', 'last_name', 'company_name', 'address', 'city', 'county', 'postal', 'phone1', 'phone2', 'email', 'web'];
-      
+  
     objData = [
       { first_name: 'Aleshia', last_name: 'Tomkiewicz', company_name: 'Alan D Rosenburg Cpa Pc', address: '14 Taylor St', city: 'St. Stephens Ward', county: 'Kent', postal: 'CT2 7PP', phone1: '01835-703597', phone2: '01944-369967', email: 'atomkiewicz@hotmail.com', web: 'http://www.alandrosenburgcpapc.co.uk' },
       { first_name: 'Evan', last_name: 'Zigomalas', company_name: 'Cap Gemini America', address: '5 Binney St', city: 'Abbey Ward', county: 'Buckinghamshire', postal: 'HP11 2AX', phone1: '01937-864715', phone2: '01714-737668', email: 'evan.zigomalas@gmail.com', web: 'http://www.capgeminiamerica.co.uk' },
@@ -39,82 +42,38 @@ describe('SERVICE: ParserService', function() {
       { first_name: 'Lura', last_name: 'Manzella', company_name: 'Bizerba Usa Inc', address: '929 Augustine St', city: 'Staple Hill Ward', county: 'South Gloucestershire', postal: 'BS16 4LL', phone1: '01907-538509', phone2: '01340-713951', email: 'lura@hotmail.com', web: 'http://www.bizerbausainc.co.uk' },
       { first_name: 'Yuette', last_name: 'Klapec', company_name: 'Max Video', address: '45 Bradfield St #166', city: 'Parwich', county: 'Derbyshire', postal: 'DE6 1QN', phone1: '01903-649460', phone2: '01933-512513', email: 'yuette.klapec@klapec.co.uk', web: 'http://www.maxvideo.co.uk' }
     ];
-    
+  
+  
+    event = {
+      target: {
+        files: [
+          new Blob([csvContent], {type: 'text/csv'})
+        ]
+      }
+    }
   }));
-
-  it('should exist', function() {
-    expect(ParserService).toBeDefined();
+  
+  describe('FUNCTION: titleCase', function() {
+    it('should remove underscores and convert to titleCase', function() {
+      var controller = createController();
+      var text = 'sample_text';
+      
+      expect(scope.titleCase(text)).toEqual('Sample Text');
+    });
   });
   
-  describe('METHOD: ReadFile', function() {
-    it('should exist', function() {
-      expect(typeof ParserService.ReadFile).toBeDefined();
-    });
-    
-    it('should be of type function', function() {
-      expect(typeof ParserService.ReadFile).toBe('function');
-    });
-    
-    describe('SCENARIO: Reading a file', function() {
-      it('should be able to read a file', function(done) {
-        
-        var file = new Blob([csvContent], {type: 'text/csv'});
+  describe('FUNCTION: processCSV', function() {
+    it('should process a CSV and update $scope.fileContent', function(done) {
+      var controller = createController();
   
-        ParserService.ReadFile(file)
-                     .then(function(content) {
-                      expect(content).toBeDefined();
-                      expect(content).toEqual(csvContent);
-                      done();
-                     });
-      });
-    })
-  });
-  
-  describe('METHOD: CSVToObject', function() {
-    it('should exist', function() {
-      expect(typeof ParserService.CSVToObject).toBeDefined();
-    });
-    
-    it('should be of type function', function() {
-      expect(typeof ParserService.CSVToObject).toBe('function');
-    });
-    
-    describe('SCENARIO: Converting from CSV to Object', function() {
-      it('should process the CSV and return an object', function(done) {
-        var file = new Blob([csvContent], {type: 'text/csv'});
-  
-        ParserService.CSVToObject(file)
-                     .then(function (csvObject) {
-                        expect(csvObject).toBeDefined();
-                        expect(typeof csvObject).toBe('object');
-                        expect(csvObject.headers).toEqual(objHeaders);
-                        expect(csvObject.data).toEqual(objData);
-                        done();
-                     });
-      });
-    })
-  });
-  
-  describe('METHOD: ParseCSV', function() {
-    it('should exist', function() {
-      expect(typeof ParserService.ParseCSV).toBeDefined();
-    });
-    
-    it('should be of type function', function() {
-      expect(typeof ParserService.ParseCSV).toBe('function');
-    });
-    
-    describe('SCENARIO: Parsing a CSV string', function() {
-      it('should parse the CSV string and return an object', function(done) {
-          ParserService.ParseCSV(csvContent)
-                       .then(function (csvObject) {
-                         expect(csvObject).toBeDefined();
-                         expect(typeof csvObject).toBe('object');
-                         expect(csvObject.headers).toEqual(objHeaders);
-                         expect(csvObject.data).toEqual(objData);
-                         done();
-                       });
-      });
+      scope.processCSV(event)
+        .then((function () {
+          scope.$digest();
+          expect(scope.fileContent.headers).toEqual(objHeaders);
+          expect(scope.fileContent.data).toEqual(objData);
+          
+          done();
+        }));
     });
   });
 });
